@@ -36,7 +36,7 @@ Midi
 Licence
 CC-BY-SA-NC
 
-CDXbow with help from his silicon friend, Copilot, 2025.
+By CDXbow with help from his silicon friend, Copilot, 2025.
 
 TODO
 Second LFO
