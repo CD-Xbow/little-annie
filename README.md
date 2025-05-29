@@ -2,7 +2,7 @@ L I T T L E -  A N N I E
 
 A polyphonic, virtual analog web synthesizer in plain HTML, CSS and Javascript
 
-It's easy to use and features 
+It's easy to use and features: 
 dual oscillators, 
 LFO
 Variable LPF, HPF, BPF with it's own envelope control
