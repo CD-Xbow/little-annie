@@ -9,6 +9,7 @@ Variable LPF, HPF, BPF with it's own envelope control
 ADSR
 MIDI
 patch save and load 
+Piano Keyboard - WARNING this does not work with Webkit browser at present
 
 
 Sounds Sources
@@ -22,12 +23,25 @@ Filter
 Variable LPF, HPF, BPF with it's own envelope control
 
 Envelope
+Classic ADSR envelope control
 
 Effects
+Reverb/delay
 
 Patches
 Your masterful creations can be saved and loaded as JSON files.
 
 Midi
 
-CDXbow with help from his silicon friend, Copilot, 2025. 
+Licence
+CC-BY-SA-NC
+
+CDXbow with help from his silicon friend, Copilot, 2025.
+
+TODO
+Second LFO
+Fix keyboard (or remove)
+Test on raspberry pi
+
+
+ 
