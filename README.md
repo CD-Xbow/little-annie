@@ -1,3 +1,6 @@
+
+![Example Image](little-annie.jpg).
+
 L I T T L E -  A N N I E
 
 A polyphonic, virtual analog web synthesizer in plain HTML, CSS and Javascript
