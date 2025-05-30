@@ -3,7 +3,9 @@ L I T T L E -  A N N I E
 A polyphonic, virtual analog web synthesizer in plain HTML, CSS and Javascript
 
 **************** WARNING *************
-this does not work with Webkit browser at present
+
+this may not work with Webkit browser at present
+
 Works in Edge, Opera and Chrome 
 
 
