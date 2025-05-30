@@ -8,6 +8,8 @@ this may not work with Webkit browser at present
 
 Works in Edge, Opera and Chrome 
 
+Note - The keyboard works but does not render properly.
+
 
 It's easy to use and features: 
 - dual oscillators, 
