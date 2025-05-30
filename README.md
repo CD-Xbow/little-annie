@@ -2,6 +2,8 @@ L I T T L E -  A N N I E
 
 A polyphonic, virtual analog web synthesizer in plain HTML, CSS and Javascript
 
+No javascript libraries were harmed in it's production
+
 **************** WARNING *************
 
 this may not work with Webkit browser at present
