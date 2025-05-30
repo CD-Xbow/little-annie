@@ -48,11 +48,4 @@ Licence: CC-BY-SA-NC
 
 By  CDXbow with help from his silicon friend, Copilot
 
-
-TODO
-Second LFO
-Fix keyboard (or remove)
-Test on raspberry pi
-
-
- 
+Share and Enjoy!
