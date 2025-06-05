@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--2.7KF Keyboard fixed - this is the base version for little annie -->
+    <meta charset="UTF-8">
+    <title>Little Annie - Web Synthesizer v2.7</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" href="favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --app-bg: #f2f2f2;
+            --app-text: #222;
+            --panel-bg: #fff;
+            --panel-border: #bbb;
+            --slider-thumb: #888;
+            --button-bg: #eee;
+            --button-hover: #d0d0d0;
+            --button-border: #ccc;
+        }
+        [data-theme=dark] {
+            --app-bg: #22272e;
+            --app-text: #eaeaea;
+            --panel-bg: #23272e;
+            --panel-border: #444c56;
+            --slider-thumb: #bbb;
+            --button-bg: #323842;
+            --button-hover: #444c56;
+            --button-border: #444c56;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--app-bg);
+            color: var(--app-text);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            background: var(--button-bg);
+            border-bottom: 1px solid var(--button-border);
+            padding: 7px 14px;
+            z-index: 10;
+            position: relative;
+        }
+        .top-bar button, .top-bar select, .top-bar label {
+            background: var(--button-bg);
+            color: var(--app-text);
+            border: 1px solid var(--button-border);
+            border-radius: 5px;
+            padding: 7px 13px;
+            margin: 0 2px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.18s;
+        }
+        .top-bar button:hover, .top-bar select:hover {
+            background: var(--button-hover);
+        }
+        .top-bar .spacer {
+            width: 16px;
+            display: inline-block;
+        }
+        .top-bar .dropdown-label {
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        .synth-panel {
+            margin: 24px auto;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 12px;
+            max-width: 1180px;
+            box-shadow: 0 4px 24px #0003;
+            padding: 24px 18px 16px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px 16px;
+            justify-content: center;
+        }
+        .module {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 18px 15px 10px 15px;
+            min-width: 180px;
+            flex: 1 1 220px;
+            box-sizing: border-box;
+        }
+        .module h3 {
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            font-size: 1.12em;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .controls label {
+            font-size: 0.99em;
+            margin-bottom: 2px;
+        }
+        .controls input[type=range] {
+            width: 100%;
+            accent-color: var(--slider-thumb);
+        }
+        .controls select, .controls input[type=number] {
+            width: 100%;
+            padding: 3px 4px;
+            border-radius: 4px;
+            font-size: 1em;
+            margin-top: 2px;
+            border: 1px solid var(--panel-border);
+        }
+  .keyboard {
+    margin: 28px auto 8px auto;
+    display: flex;
+    justify-content: center;
+    user-select: none;
+}
+.keyboard .key-container {
+    position: relative;
+    display: inline-block;
+}
+.key {
+    width: 28px;
+    height: 120px;
+    margin: 0 1px;
+    border-radius: 0 0 5px 5px;
+    border: 1px solid #888;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.key.pressed {
+    background: #d8e2ff;
+}
+.key.black {
+    width: 20px;
+    height: 80px;
+    background: #111;
+    border: 1px solid #222;
+    position: absolute;
+    left: 19px;
+    top: 0;
+    margin-left: -10px;
+    margin-right: -10px;
+    z-index: 2;
+    color: #fff;
+}
+.key.black.pressed {
+    background: #444;
+}
+.key-label {
+    position: absolute;
+    bottom: 4px;
+    left: 3px;
+    font-size: 0.77em;
+    color: #666;
+    z-index: 10;
+    pointer-events: none;
+}      
+
+ .fileinput {
+            display: none;
+        }
+        .fx-row { display: flex; flex-wrap: wrap; gap: 12px; }
+        .fx-module { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px; min-width: 120px; flex:1 1 120px;}
+        .fx-module h4 { margin:3px 0 5px 0;font-size:1em;text-align:center;}
+        @media (max-width: 1180px) {
+            .synth-panel { flex-direction: column; align-items: stretch; }
+            .module { min-width: 160px; }
+        }
+        @media (max-width: 600px) {
+            .synth-panel { padding: 9px 2px; }
+            .module { min-width: 110px; padding: 6px 3px 5px 3px; }
+        }
+    </style>
+</head>
+<body>
+<div class="top-bar" id="topBar">
+    <button id="btnClear" title="Clear all parameters to defaults">Clear</button>
+    <button id="btnLoad" title="Load patch file">Load</button>
+    <button id="btnSave" title="Save patch">Save</button>
+    <button id="btnRename" title="Save patch as...">Rename</button>
+    <span class="spacer"></span>
+    <button id="btnTheme" title="Toggle light/dark theme">Theme</button>
+    <span class="spacer"></span>
+    <button id="btnMidiConnect">MIDI Connect</button>
+    <button id="btnMidiDisconnect">Disconnect</button>
+    <label for="midiChannelSel" class="dropdown-label">Channel:</label>
+    <select id="midiChannelSel">
+        <option value="0">1</option>
+        <option value="1">2</option>
+        <option value="2">3</option>
+        <option value="3">4</option>
+        <option value="4">5</option>
+        <option value="5">6</option>
+        <option value="6">7</option>
+        <option value="7">8</option>
+        <option value="8">9</option>
+        <option value="9">10</option>
+        <option value="10">11</option>
+        <option value="11">12</option>
+        <option value="12">13</option>
+        <option value="13">14</option>
+        <option value="14">15</option>
+        <option value="15">16</option>
+    </select>
+    <span id="midiStatus" style="margin-left:12px;min-width:120px;">MIDI Status: <span id="midiStatusText">Not connected</span></span>
+    <span class="spacer"></span>
+    <button id="btnHelp">Help</button>
+    <button id="btnAbout">About</button>
+</div>
+<div class="synth-panel">
+    <div class="module">
+        <h3>LITTLE ANNIE</h3>
+    </div>
+    <div class="module">
+        <h3>Oscillator 1</h3>
+        <div class="controls">
+            <label>Waveform
+                <select id="osc1Wave">
+                    <option value="sine">Sine</option>
+                    <option value="square">Square</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="sawtooth">Sawtooth</option>
+                </select>
+            </label>
+            <label>Octave
+                <input type="number" id="osc1Octave" min="-2" max="2" value="0">
+            </label>
+            <label>Detune
+                <input type="range" id="osc1Detune" min="-100" max="100" value="0">
+            </label>
+            <label>Volume
+                <input type="range" id="osc1Gain" min="0" max="1" value="0.8" step="0.01">
+            </label>
+        </div>
+    </div>
+    <div class="module">
+        <h3>Oscillator 2</h3>
+        <div class="controls">
+            <label>Waveform
+                <select id="osc2Wave">
+                    <option value="sine">Sine</option>
+                    <option value="square">Square</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="sawtooth">Sawtooth</option>
+                </select>
+            </label>
+            <label>Octave
+                <input type="number" id="osc2Octave" min="-2" max="2" value="0">
+            </label>
+            <label>Detune
+                <input type="range" id="osc2Detune" min="-100" max="100" value="0">
+            </label>
+            <label>Volume
+                <input type="range" id="osc2Gain" min="0" max="1" value="0.8" step="0.01">
+            </label>
+        </div>
+    </div>
+    <div class="module">
+        <h3>Oscillator Mix</h3>
+        <div class="controls">
+            <label>Mix (Osc1 ⇄ Osc2)
+                <input type="range" id="oscMix" min="0" max="1" step="0.01" value="0.5">
+            </label>
+        </div>
+        <div class="controls">
+            <h4 style="margin:6px 0 2px 0;">White Noise</h4>
+            <label>Noise Volume
+                <input type="range" id="noiseGain" min="0" max="1" step="0.01" value="0">
+            </label>
+        </div>
+    </div>
+    <div class="module">
+        <h3>LFO</h3>
+        <div class="controls">
+            <label>Waveform
+                <select id="lfoWave">
+                    <option value="sine">Sine</option>
+                    <option value="square">Square</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="sawtooth">Sawtooth</option>
+                </select>
+            </label>
+            <label>Rate (Hz)
+                <input type="range" id="lfoRate" min="0.1" max="20" step="0.01" value="5">
+            </label>
+            <label>Amount
+                <input type="range" id="lfoAmt" min="0" max="1" step="0.01" value="0.1">
+            </label>
+            <label>Target
+                <select id="lfoTarget">
+                    <option value="osc1freq">Osc 1 Pitch</option>
+                    <option value="osc2freq">Osc 2 Pitch</option>
+                    <option value="filter">Filter Cutoff</option>
+                    <option value="amp">Amplitude</option>
+                </select>
+            </label>
+        </div>
+    </div>
+    <div class="module">
+        <h3>Filter</h3>
+        <div class="controls">
+            <label>Type
+                <select id="filterType">
+                    <option value="lowpass">Lowpass</option>
+                    <option value="highpass">Highpass</option>
+                    <option value="bandpass">Bandpass</option>
+                </select>
+            </label>
+            <label>Cutoff
+                <input type="range" id="filterCutoff" min="50" max="8000" value="1500">
+            </label>
+            <label>Resonance
+                <input type="range" id="filterQ" min="0.1" max="20" step="0.1" value="1">
+            </label>
+        </div>
+        <div class="controls">
+            <label>Filter Envelope Amount
+                <input type="range" id="filterEnvAmt" min="0" max="1" step="0.01" value="0.5">
+            </label>
+            <label>Attack
+                <input type="range" id="filterEnvA" min="0.001" max="2" step="0.001" value="0.04">
+            </label>
+            <label>Decay
+                <input type="range" id="filterEnvD" min="0.001" max="2" step="0.001" value="0.1">
+            </label>
+            <label>Sustain
+                <input type="range" id="filterEnvS" min="0" max="1" step="0.01" value="0.6">
+            </label>
+            <label>Release
+                <input type="range" id="filterEnvR" min="0.001" max="2" step="0.001" value="0.2">
+            </label>
+        </div>
+    </div>
+    <div class="module">
+        <h3>Amplitude Envelope</h3>
+        <div class="controls">
+            <label>Attack
+                <input type="range" id="ampEnvA" min="0.001" max="2" step="0.001" value="0.03">
+            </label>
+            <label>Decay
+                <input type="range" id="ampEnvD" min="0.001" max="2" step="0.001" value="0.15">
+            </label>
+            <label>Sustain
+                <input type="range" id="ampEnvS" min="0" max="1" step="0.01" value="0.7">
+            </label>
+            <label>Release
+                <input type="range" id="ampEnvR" min="0.001" max="2" step="0.001" value="0.3">
+            </label>
+        </div>
+    </div>
+    <div class="module">
+        <h3>Effects</h3>
+        <div class="fx-row">
+            <div class="fx-module">
+                <h4>Delay</h4>
+                <label>Time
+                    <input type="range" id="fxDelayTime" min="0" max="1" step="0.01" value="0">
+                </label>
+                <label>Feedback
+                    <input type="range" id="fxDelayFB" min="0" max="0.95" step="0.01" value="0">
+                </label>
+            </div>
+            <div class="fx-module">
+                <h4>Reverb</h4>
+                <label>Amount
+                    <input type="range" id="fxReverbMix" min="0" max="1" step="0.01" value="0">
+                </label>
+            </div>
+            <label><br> Master Volume <br><input type="range" id="fxDelayMix" min="0" max="1" step="0.01" value="0.75">
+            </label>
+        </div>
+    </div>
+</div>
+<div class="keyboard" id="keyboard"></div>
+<input type="file" id="patchLoadInput" class="fileinput" accept=".json,.patch">
+<script>
+/* --- THEME --- */
+function setTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+    }
+}
+function toggleTheme() {
+    const theme = localStorage.getItem('theme') || 'light';
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+}
+document.getElementById('btnTheme').onclick = toggleTheme;
+(function() {
+    const theme = localStorage.getItem('theme') || 'light';
+    setTheme(theme);
+})();
+
+/* --- PATCH SAVE/LOAD --- */
+function getParam(id) {
+    let el = document.getElementById(id);
+    if (el.type === "range" || el.type === "number") return parseFloat(el.value);
+    return el.value;
+}
+function setParam(id, val) {
+    let el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === "range" || el.type === "number") el.value = val;
+    else el.value = val;
+}
+function getPatch() {
+    const ids = [
+        "osc1Wave","osc1Octave","osc1Detune","osc1Gain",
+        "osc2Wave","osc2Octave","osc2Detune","osc2Gain",
+        "oscMix","noiseGain","filterType","filterCutoff","filterQ",
+        "filterEnvAmt","filterEnvA","filterEnvD","filterEnvS","filterEnvR",
+        "ampEnvA","ampEnvD","ampEnvS","ampEnvR",
+        "lfoWave","lfoRate","lfoAmt","lfoTarget",
+        "fxDelayTime","fxDelayFB","fxDelayMix","fxReverbMix"
+    ];
+    let patch = {};
+    ids.forEach(id => patch[id] = getParam(id));
+    return patch;
+}
+function setPatch(patch) {
+    Object.keys(patch).forEach(id => setParam(id, patch[id]));
+}
+function downloadPatch(name) {
+    let patch = getPatch();
+    let blob = new Blob([JSON.stringify(patch, null, 2)], {type:'application/json'});
+    let a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name || 'patch.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(a.href);},100);
+}
+function openPatchFile(file) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            let patch = JSON.parse(e.target.result);
+            setPatch(patch);
+        } catch (err) {
+            alert("Invalid patch file.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+/* --- TOP BAR BUTTONS --- */
+document.getElementById('btnSave').onclick = function() {
+    downloadPatch('patch.json');
+};
+document.getElementById('btnRename').onclick = function() {
+    let name = prompt("Filename:", "patch.json");
+    if (name) downloadPatch(name);
+};
+document.getElementById('btnLoad').onclick = function() {
+    document.getElementById('patchLoadInput').click();
+};
+document.getElementById('patchLoadInput').onchange = function(e) {
+    let file = e.target.files[0];
+    if (file) openPatchFile(file);
+    this.value = "";
+};
+document.getElementById('btnClear').onclick = function() {
+    if (confirm("Reset all parameters to default?")) {
+        location.reload();
+    }
+};
+
+/* --- MIDI --- */
+let midiAccess = null;
+let midiInput = null;
+let midiEnabled = false;
+let midiChannel = 0;
+
+document.getElementById('btnMidiConnect').onclick = function() {
+    if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+    } else {
+        alert("Web MIDI API not supported in this browser.");
+    }
+};
+document.getElementById('btnMidiDisconnect').onclick = function() {
+    midiEnabled = false;
+    document.getElementById('midiStatusText').textContent = "Disconnected";
+    if (midiInput) midiInput.onmidimessage = null;
+};
+document.getElementById('midiChannelSel').addEventListener('change', function() {
+    midiChannel = parseInt(this.value);
+});
+
+/* --- PATCH ENGINE & AUDIO (same as previous, with noiseGain now included) --- */
+// ... (Audio engine and keyboard code below unchanged except noiseGain is now included in patch)
+
+let audioCtx = null;
+let currentKeys = new Map();
+
+function noteToFreq(note, octave=0) {
+    return 440 * Math.pow(2, (note - 69 + octave*12) / 12);
+}
+
+// KEYBOARD WIDGET
+const KEY_LAYOUT = [
+    {code:"KeyZ", note:60, label:'C'},
+    {code:"KeyS", note:61, label:'C#', black:true},
+    {code:"KeyX", note:62, label:'D'},
+    {code:"KeyD", note:63, label:'D#', black:true},
+    {code:"KeyC", note:64, label:'E'},
+    {code:"KeyV", note:65, label:'F'},
+    {code:"KeyG", note:66, label:'F#', black:true},
+    {code:"KeyB", note:67, label:'G'},
+    {code:"KeyH", note:68, label:'G#', black:true},
+    {code:"KeyN", note:69, label:'A'},
+    {code:"KeyJ", note:70, label:'A#', black:true},
+    {code:"KeyM", note:71, label:'B'},
+    {code:"Comma", note:72, label:'C'},
+    {code:"KeyL", note:73, label:'C#', black:true},
+    {code:"Period", note:74, label:'D'},
+    {code:"Semicolon", note:75, label:'D#', black:true},
+    {code:"Slash", note:76, label:'E'}
+];
+function buildKeyboard() {
+    const kb = document.getElementById('keyboard');
+    kb.innerHTML = '';
+    for (let i=0; i<KEY_LAYOUT.length; i++) {
+        let k = KEY_LAYOUT[i];
+        if (k.black) continue;
+        let c = document.createElement('div');
+        c.className = 'key-container';
+        let key = document.createElement('div');
+        key.className = 'key';
+        key.dataset.note = k.note;
+        key.innerHTML = `<span class="key-label">${k.label}</span>`;
+        c.appendChild(key);
+        if (i+1 < KEY_LAYOUT.length && KEY_LAYOUT[i+1].black) {
+            let bk = document.createElement('div');
+            bk.className = 'key black';
+            bk.dataset.note = KEY_LAYOUT[i+1].note;
+            bk.innerHTML = `<span class="key-label">${KEY_LAYOUT[i+1].label}</span>`;
+            c.appendChild(bk);
+        }
+        kb.appendChild(c);
+    }
+}
+buildKeyboard();
+
+function createVoice(midiNote, velocity=1) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    // Oscillator 1
+    let osc1 = audioCtx.createOscillator();
+    osc1.type = getParam("osc1Wave");
+    osc1.frequency.value = noteToFreq(midiNote, getParam("osc1Octave"));
+    osc1.detune.value = getParam("osc1Detune");
+    let osc1Gain = audioCtx.createGain();
+    osc1Gain.gain.value = getParam("osc1Gain");
+    osc1.connect(osc1Gain);
+
+    // Oscillator 2
+    let osc2 = audioCtx.createOscillator();
+    osc2.type = getParam("osc2Wave");
+    osc2.frequency.value = noteToFreq(midiNote, getParam("osc2Octave"));
+    osc2.detune.value = getParam("osc2Detune");
+    let osc2Gain = audioCtx.createGain();
+    osc2Gain.gain.value = getParam("osc2Gain");
+    osc2.connect(osc2Gain);
+
+    // White Noise (buffer source)
+    let noiseGain = audioCtx.createGain();
+    noiseGain.gain.value = getParam("noiseGain");
+    let noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
+    let noiseData = noiseBuffer.getChannelData(0);
+    for (let i=0; i<noiseBuffer.length; i++) noiseData[i] = Math.random()*2-1;
+    let noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+    noise.connect(noiseGain);
+
+    // Mix
+    let mix = audioCtx.createGain();
+    let mixVal = getParam("oscMix");
+    osc1Gain.gain.value = getParam("osc1Gain") * (1-mixVal);
+    osc2Gain.gain.value = getParam("osc2Gain") * mixVal;
+    osc1Gain.connect(mix);
+    osc2Gain.connect(mix);
+    noiseGain.connect(mix);
+
+    // LFO
+    let lfo = audioCtx.createOscillator();
+    lfo.type = getParam("lfoWave");
+    lfo.frequency.value = getParam("lfoRate");
+    let lfoAmt = audioCtx.createGain();
+    lfoAmt.gain.value = getParam("lfoAmt");
+    lfo.connect(lfoAmt);
+
+    // LFO target routing
+    let lfoTarget = getParam("lfoTarget");
+    if (lfoTarget === "osc1freq") lfoAmt.connect(osc1.frequency);
+    if (lfoTarget === "osc2freq") lfoAmt.connect(osc2.frequency);
+    // Will connect filter after creation if needed
+
+    // Filter
+    let filter = audioCtx.createBiquadFilter();
+    filter.type = getParam("filterType");
+    filter.Q.value = getParam("filterQ");
+    let baseCutoff = getParam("filterCutoff");
+    filter.frequency.value = baseCutoff;
+
+    // Envelope params
+    let filterEnvA = getParam("filterEnvA");
+    let filterEnvD = getParam("filterEnvD");
+    let filterEnvS = getParam("filterEnvS");
+    let filterEnvR = getParam("filterEnvR");
+    let filterEnvAmt = getParam("filterEnvAmt");
+    let ampEnvA = getParam("ampEnvA");
+    let ampEnvD = getParam("ampEnvD");
+    let ampEnvS = getParam("ampEnvS");
+    let ampEnvR = getParam("ampEnvR");
+
+    // Output/amp envelope
+    let outputGain = audioCtx.createGain();
+    outputGain.gain.value = 0;
+
+    // Connect LFO to filter if needed
+    if (lfoTarget === "filter") lfoAmt.connect(filter.frequency);
+    // Connect
+    mix.connect(filter);
+    filter.connect(outputGain);
+
+    // Effects: Delay
+    let delay = audioCtx.createDelay(2.0);
+    delay.delayTime.value = getParam("fxDelayTime");
+    let delayFB = audioCtx.createGain();
+    delayFB.gain.value = getParam("fxDelayFB");
+    let delayMix = audioCtx.createGain();
+    delayMix.gain.value = getParam("fxDelayMix");
+    // Feedback loop
+    delay.connect(delayFB);
+    delayFB.connect(delay);
+    // Main output
+    outputGain.connect(delay);
+    outputGain.connect(delayMix);
+    delay.connect(delayMix);
+
+    // Effects: Reverb (Convolver, with simple impulse)
+    let reverb = audioCtx.createConvolver();
+    reverb.buffer = makeImpulseBuffer(audioCtx, 2.5, 2);
+    let reverbMix = audioCtx.createGain();
+    reverbMix.gain.value = getParam("fxReverbMix");
+    delayMix.connect(reverb);
+    delayMix.connect(audioCtx.destination);
+    reverb.connect(reverbMix);
+    reverbMix.connect(audioCtx.destination);
+
+    // Envelope scheduling (filter)
+    let envCutoff = baseCutoff + filterEnvAmt * baseCutoff;
+    filter.frequency.cancelScheduledValues(now);
+    filter.frequency.setValueAtTime(baseCutoff, now);
+    filter.frequency.linearRampToValueAtTime(envCutoff, now + filterEnvA);
+    filter.frequency.linearRampToValueAtTime(baseCutoff + filterEnvS * filterEnvAmt * baseCutoff, now + filterEnvA + filterEnvD);
+
+    // Envelope scheduling (amp)
+    outputGain.gain.cancelScheduledValues(now);
+    outputGain.gain.setValueAtTime(0, now);
+    outputGain.gain.linearRampToValueAtTime(velocity, now + ampEnvA);
+    outputGain.gain.linearRampToValueAtTime(velocity * ampEnvS, now + ampEnvA + ampEnvD);
+
+    osc1.start(now);
+    osc2.start(now);
+    lfo.start(now);
+    noise.start(now);
+
+    return {
+        stop: function() {
+            let t = audioCtx.currentTime;
+            filter.frequency.cancelScheduledValues(t);
+            filter.frequency.setTargetAtTime(baseCutoff, t, filterEnvR/2);
+            outputGain.gain.cancelScheduledValues(t);
+            outputGain.gain.setValueAtTime(outputGain.gain.value, t);
+            outputGain.gain.linearRampToValueAtTime(0, t + ampEnvR);
+            osc1.stop(t + ampEnvR + 0.05);
+            osc2.stop(t + ampEnvR + 0.05);
+            lfo.stop(t + ampEnvR + 0.05);
+            noise.stop(t + ampEnvR + 0.05);
+            setTimeout(() => {
+                osc1.disconnect();
+                osc2.disconnect();
+                osc1Gain.disconnect();
+                osc2Gain.disconnect();
+                noise.disconnect();
+                noiseGain.disconnect();
+                mix.disconnect();
+                filter.disconnect();
+                outputGain.disconnect();
+                delay.disconnect();
+                delayFB.disconnect();
+                delayMix.disconnect();
+                reverb.disconnect();
+                reverbMix.disconnect();
+            }, (ampEnvR + 0.1) * 1000);
+        }
+    };
+}
+
+// Simple impulse for reverb
+function makeImpulseBuffer(ctx, duration, decay) {
+    let rate = ctx.sampleRate;
+    let length = rate * duration;
+    let impulse = ctx.createBuffer(2, length, rate);
+    for (let c = 0; c < 2; c++) {
+        let ch = impulse.getChannelData(c);
+        for (let i = 0; i < length; i++) {
+            ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+        }
+    }
+    return impulse;
+}
+
+// --- KEYBOARD and MIDI handling ---
+function noteOn(note, velocity=1) {
+    if (currentKeys.has(note)) return;
+    let voice = createVoice(note, velocity);
+    currentKeys.set(note, voice);
+}
+function noteOff(note) {
+    let voice = currentKeys.get(note);
+    if (voice) {
+        voice.stop();
+        currentKeys.delete(note);
+    }
+}
+document.getElementById('keyboard').addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('key')) {
+        let note = parseInt(e.target.dataset.note);
+        noteOn(note, 1);
+        e.target.classList.add('pressed');
+    }
+});
+document.getElementById('keyboard').addEventListener('mouseup', function(e) {
+    if (e.target.classList.contains('key')) {
+        let note = parseInt(e.target.dataset.note);
+        noteOff(note);
+        e.target.classList.remove('pressed');
+    }
+});
+document.getElementById('keyboard').addEventListener('mouseleave', function(e) {
+    document.querySelectorAll('.key.pressed').forEach(k => {
+        let note = parseInt(k.dataset.note);
+        noteOff(note);
+        k.classList.remove('pressed');
+    });
+});
+let pressedKeys = {};
+window.addEventListener('keydown', function(e) {
+    if (e.repeat) return;
+    let kl = KEY_LAYOUT.find(k => k.code === e.code);
+    if (kl && !pressedKeys[e.code]) {
+        pressedKeys[e.code] = true;
+        noteOn(kl.note, 1);
+        document.querySelectorAll('.key[data-note="'+kl.note+'"]').forEach(k=>k.classList.add('pressed'));
+    }
+});
+window.addEventListener('keyup', function(e) {
+    let kl = KEY_LAYOUT.find(k => k.code === e.code);
+    if (kl) {
+        pressedKeys[e.code] = false;
+        noteOff(kl.note);
+        document.querySelectorAll('.key[data-note="'+kl.note+'"]').forEach(k=>k.classList.remove('pressed'));
+    }
+});
+
+// --- MIDI ---
+function onMIDISuccess(midi) {
+    midiAccess = midi;
+    midiEnabled = true;
+    document.getElementById('midiStatusText').textContent = "Connected";
+    for (let input of midiAccess.inputs.values()) {
+        input.onmidimessage = handleMIDI;
+        midiInput = input;
+    }
+}
+function onMIDIFailure() {
+    document.getElementById('midiStatusText').textContent = "Not connected";
+    midiEnabled = false;
+}
+function handleMIDI(event) {
+    if (!midiEnabled) return;
+    let [status, note, velocity] = event.data;
+    let cmd = status >> 4, channel = status & 0xf;
+    if (channel !== midiChannel) return;
+    if (cmd === 9 && velocity > 0) { // note on
+        noteOn(note, velocity/127);
+    } else if ((cmd === 8) || (cmd === 9 && velocity === 0)) { // note off
+        noteOff(note);
+    }
+}
+
+/* --- HELP & ABOUT --- */
+document.getElementById('btnAbout').onclick = function() {
+    alert('L I T T L E  A N N I E\nA virtual analog web synthesizer in plain HTML, CSS and Javascript\n\nAn easy to use dual oscillator polyphonic synth with MIDI,\npatch save and load and computer keyboard play.\n\nhttps://github.com/CD-Xbow/little-annie');
+};
+document.getElementById('btnHelp').onclick = function() {
+    window.open('help.html', '_blank');
+};
+
+</script>
+</body>
+</html>
