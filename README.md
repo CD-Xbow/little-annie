@@ -7,14 +7,7 @@ A polyphonic, virtual analog web synthesizer in plain HTML, CSS and Javascript
 
 No javascript libraries were harmed in it's production
 
-**************** WARNING *************
-
-this may not work with Webkit browser at present
-
-Works in Edge, Opera and Chrome 
-
-Note - The keyboard works but does not render properly.
-
+Works in Edge, Opera and Chrome and Safari on Mac OS
 
 It's easy to use and features: 
 - dual oscillators, 
