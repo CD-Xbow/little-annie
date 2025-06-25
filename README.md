@@ -10,8 +10,9 @@ No javascript libraries were harmed in it's production
 Works in Edge, Opera and Chrome and Safari on Mac OS
 
 It's easy to use and features: 
-- dual oscillators, 
-- LFO
+- Dual oscillators 
+- Dual LFO
+- Dual Envelope - amplitude and filer 
 - Variable LPF, HPF, BPF with it's own envelope control
 - ADSR
 - MIDI
@@ -26,7 +27,7 @@ Sounds Sources
 
 Modulators
 
-- The oscillators, filters and amplitude can be modulated by the LFO
+- The oscillators, filters and amplitude can be modulated by one of 2 LFO
 
 Filter
 
