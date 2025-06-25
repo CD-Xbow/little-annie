@@ -32,6 +32,7 @@ Modulators
 Filter
 
 - Variable LPF, HPF, BPF with it's own envelope control
+- LPF is 24 db/octave, the others 12 db/octave
 
 Envelope
 
@@ -41,10 +42,11 @@ Effects
 - Reverb/delay
 
 Patches
-- Your masterful creations can be saved and loaded as JSON files.
+- Your masterful creations can be saved and loaded as patches which are JSON files.
 
 Midi
-
+- midi in with channel selection
+- 
 Licence: CC-BY-SA-NC
 
 I had some help from my silicon best friend, Copilot
