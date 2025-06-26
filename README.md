@@ -47,18 +47,21 @@ Patches
 Midi
 - midi in with channel selection
 - velocity responsive
+
+More details about her features can be found in the help file. 
  
 Licence: CC-BY-SA-NC
 
 I had some help from my silicon best friend, Copilot
 
-You can give her a go here - https://little-annie.puter.site/
+You can give her a go here online - https://little-annie.puter.site/
 
-## Share and Enjoy!
 
 ### UPDATE - Little Annie Stands Alone.
 
 Little Annie can now run out of the browser. Well, not really, it uses the Webview2 Chromium browser control and a wrapper coded in PureBasic 6. She seems to be happy with it.
-There is a Little-Annine.exe and WebView2Loader.dll which must all be in the same folder as the web stuff for it to work, same as in the repo.    
+There is a Little-Annie.exe and WebView2Loader.dll which must all be in the same folder as the web stuff for it to work, just as in the repo.
+
+## Share and Enjoy!
 
 
