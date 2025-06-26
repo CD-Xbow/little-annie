@@ -46,11 +46,14 @@ Patches
 
 Midi
 - midi in with channel selection
-- 
+- velocity responsive
+ 
 Licence: CC-BY-SA-NC
 
 I had some help from my silicon best friend, Copilot
 
 You can give her a go here - https://little-annie.puter.site/
+
+
 
 ## Share and Enjoy!
