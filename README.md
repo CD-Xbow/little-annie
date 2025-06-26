@@ -12,12 +12,13 @@ Works in Edge, Opera and Chrome and Safari on Mac OS
 It's easy to use and features: 
 - Dual oscillators 
 - Dual LFO
-- Dual Envelope - amplitude and filer 
+- Dual Envelope - amplitude and filter 
 - Variable LPF, HPF, BPF with it's own envelope control
 - ADSR
-- MIDI
+- MIDI in
 - patch save and load 
-- Piano Keyboard - 
+- Piano Keyboard
+- Reverb/delay
 
 
 Sounds Sources
