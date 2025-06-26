@@ -62,7 +62,7 @@ You can give her a go here online - https://little-annie.puter.site/
 
 Little Annie can now run out of the browser. Well, not really, it uses the Webview2 Chromium browser gadget and a wrapper coded in PureBasic 6. She seems to be happy with it.
 There is a Little-Annie.exe and WebView2Loader.dll which must all be in the same folder as the web stuff for it to work, just as in the repo. 
-For those interested the repo for Webview2 is here https://github.com/omegakode/PBWebview2, I used the browser_async example for the wrapper.
+Windows 11 and 10 should run the exe alright as they should have werview2 built in, if not you can get it from here https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH
 
 ## Share and Enjoy!
 
